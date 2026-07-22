@@ -13,7 +13,7 @@ export interface KPI {
 export interface ChartData {
   id: string;
   title: string;
-  type: 'bar' | 'pie' | 'line';
+  type: 'bar' | 'pie' | 'line' | 'doughnut';
   labels: string[];
   datasets: Array<{
     label: string;
