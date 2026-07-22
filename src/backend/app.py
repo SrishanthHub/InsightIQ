@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
 from dotenv import load_dotenv
@@ -21,12 +21,15 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
+# Compute the absolute path to the dist folder (project_root/dist)
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+DIST_DIR = os.path.join(PROJECT_ROOT, 'dist')
+
 def create_app():
     """
     Factory function to create and configure the Flask application.
     """
-    # Serve static files from the React build directory (dist)
-    app = Flask(__name__, static_folder='../../dist', static_url_path='')
+    app = Flask(__name__, static_folder=DIST_DIR, static_url_path='')
     
     # Enable CORS for the frontend
     CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -48,22 +51,34 @@ def create_app():
     def health_check():
         return jsonify({'status': 'healthy', 'version': '0.1.0'}), 200
 
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
+    # Debug endpoint - shows if the dist folder exists and what's inside
+    @app.route('/debug-static', methods=['GET'])
+    def debug_static():
+        exists = os.path.isdir(DIST_DIR)
+        files = os.listdir(DIST_DIR) if exists else []
+        return jsonify({
+            'dist_dir': DIST_DIR,
+            'exists': exists,
+            'files': files,
+            'cwd': os.getcwd(),
+        }), 200
 
     @app.errorhandler(500)
     def internal_error(error):
         return jsonify({'error': 'Internal server error'}), 500
 
-    # Catch-all route to serve React app for non-API requests
+    # Catch-all route: serve React app for non-API requests
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve_react_app(path):
-        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-            return app.send_static_file(path)
-        else:
-            return app.send_static_file('index.html')
+        # If the file exists in dist, serve it (JS, CSS, images, etc.)
+        if path and os.path.isfile(os.path.join(DIST_DIR, path)):
+            return send_from_directory(DIST_DIR, path)
+        # Otherwise serve index.html and let React Router handle it
+        index_path = os.path.join(DIST_DIR, 'index.html')
+        if os.path.isfile(index_path):
+            return send_from_directory(DIST_DIR, 'index.html')
+        return jsonify({'error': 'Frontend not built. dist/index.html not found.', 'dist_dir': DIST_DIR}), 404
 
     return app
 
@@ -72,6 +87,7 @@ app = create_app()
 
 if __name__ == '__main__':
     # Create data directories if they don't exist
-    os.makedirs(os.path.join(app.root_path, '..', '..', 'data', 'uploads'), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, 'data', 'uploads'), exist_ok=True)
     
     app.run(host='0.0.0.0', port=5000, debug=True)
+
