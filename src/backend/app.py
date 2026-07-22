@@ -26,7 +26,7 @@ def create_app():
     Factory function to create and configure the Flask application.
     """
     # Serve static files from the React build directory (dist)
-    app = Flask(__name__, static_folder='../../dist', static_url_path='/')
+    app = Flask(__name__, static_folder='../../dist', static_url_path='')
     
     # Enable CORS for the frontend
     CORS(app, resources={r"/api/*": {"origins": "*"}})
