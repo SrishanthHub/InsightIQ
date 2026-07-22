@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DatasetMetadata } from './datasetApi';
 
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+const API_BASE_URL = import.meta.env.PROD ? '/api/v1' : 'http://localhost:5000/api/v1';
 
 export interface DatasetSummary {
   id: number;

@@ -17,7 +17,8 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/auth/login', { email, password });
+      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:5000';
+      const response = await axios.post(`${baseUrl}/api/v1/auth/login`, { email, password });
       login(response.data.token, response.data.user);
       navigate('/explorer');
     } catch (err: any) {

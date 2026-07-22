@@ -42,7 +42,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedToken = localStorage.getItem('insightiq_token');
       if (savedToken) {
         try {
-          const response = await axios.get('http://localhost:5000/api/v1/auth/me', {
+          const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:5000';
+          const response = await axios.get(`${baseUrl}/api/v1/auth/me`, {
             headers: { Authorization: `Bearer ${savedToken}` }
           });
           setUser(response.data.user);
