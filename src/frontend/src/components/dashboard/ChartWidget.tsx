@@ -110,7 +110,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({ data }) => {
     }
   };
 
-  const typeLabel = { bar: 'Bar Chart', line: 'Line Chart', pie: 'Pie Chart' }[data.type] ?? 'Chart';
+  const typeLabel = { bar: 'Bar Chart', line: 'Line Chart', pie: 'Pie Chart', doughnut: 'Doughnut Chart' }[data.type] ?? 'Chart';
 
   return (
     <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col">
