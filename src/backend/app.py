@@ -57,8 +57,10 @@ def create_app():
 
     return app
 
+# Initialize app globally for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     # Create data directories if they don't exist
     os.makedirs(os.path.join(app.root_path, '..', '..', 'data', 'uploads'), exist_ok=True)
     
