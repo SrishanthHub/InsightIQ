@@ -29,7 +29,8 @@ def create_app():
     """
     Factory function to create and configure the Flask application.
     """
-    app = Flask(__name__, static_folder=DIST_DIR, static_url_path='')
+    # Disable Flask's built-in static file handler to prevent conflicts with catch-all route
+    app = Flask(__name__, static_folder=None)
     
     # Enable CORS for the frontend
     CORS(app, resources={r"/api/*": {"origins": "*"}})
